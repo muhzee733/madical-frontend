@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { ACCESS_TOKEN } from './token';
 
-const apiUrl = import.meta.env.VITE_API_URL;
-console.log('API URL:', apiUrl); // Debug log
+// Ensure we're using the correct API URL
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/chat';
+console.log('Environment:', import.meta.env.MODE);
+console.log('API URL:', apiUrl);
 
 const api = axios.create({
   baseURL: apiUrl,
@@ -12,7 +14,7 @@ const api = axios.create({
     'Accept': 'application/json'
   }
 });
-// aaaa
+
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem(ACCESS_TOKEN);
@@ -23,7 +25,7 @@ api.interceptors.request.use(
     if (import.meta.env.PROD) {
       config.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin';
     }
-    console.log('Request URL:', config.baseURL + config.url); // Debug log
+    console.log('Request URL:', config.baseURL + config.url);
     return config;
   },
   (error) => {

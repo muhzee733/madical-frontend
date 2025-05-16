@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
           manualChunks: undefined
         }
       }
-    }
+    },
+    envPrefix: 'VITE_'
   }
 })
