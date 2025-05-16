@@ -1,11 +1,16 @@
 import axios from 'axios';
 import { ACCESS_TOKEN } from './token';
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/chat";
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log('API URL:', apiUrl); // Debug log
 
 const api = axios.create({
   baseURL: apiUrl,
-  withCredentials: true
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
 });
 // aaaa
 api.interceptors.request.use(
@@ -14,6 +19,11 @@ api.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+    // Add referrer policy for production
+    if (import.meta.env.PROD) {
+      config.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin';
+    }
+    console.log('Request URL:', config.baseURL + config.url); // Debug log
     return config;
   },
   (error) => {
