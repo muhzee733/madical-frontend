@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ACCESS_TOKEN } from './token';
 
 // Ensure we're using the correct API URL
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/chat';
+const apiUrl = import.meta.env.VITE_API_URL;
 console.log('Environment:', import.meta.env.MODE);
 console.log('API URL:', apiUrl);
 

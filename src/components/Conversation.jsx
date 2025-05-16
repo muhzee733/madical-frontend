@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../api";
 import "../styles/Conversation.css";
 import { ACCESS_TOKEN } from "../token";
@@ -22,13 +22,17 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
 
       try {
         setLoading(true);
-        const response = await api.get(`/conversations/${conversationId}/messages/`);
+        const response = await api.get(
+          `/conversations/${conversationId}/messages/`
+        );
         const messages = response.data || [];
         setMessages(messages);
 
         if (messages.length > 0) {
           const participants = messages[0]?.participants || [];
-          const chatPartner = participants.find((user) => user.id !== currentUserId);
+          const chatPartner = participants.find(
+            (user) => user.id !== currentUserId
+          );
 
           if (chatPartner) {
             setChatPartner(chatPartner);
@@ -50,7 +54,9 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
     if (!conversationId) return;
     const token = localStorage.getItem(ACCESS_TOKEN);
 
-    const websocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversationId}/?token=${token}`);
+    const websocket = new WebSocket(
+      `${import.meta.env.VITE_WS_URL}/ws/chat/${conversationId}/?token=${token}`
+    );
 
     websocket.onopen = () => {
       console.log("WebSocket connection established");
@@ -88,7 +94,9 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
             setOnlineUsers((prev) => [...prev, ...data.online_users]);
           } else if (data.status === "offline") {
             setOnlineUsers((prev) =>
-              prev.filter((user) => !data.online_users.some((u) => u.id === user.id))
+              prev.filter(
+                (user) => !data.online_users.some((u) => u.id === user.id)
+              )
             );
           }
         }
@@ -113,7 +121,9 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
 
   const handleSendMessage = () => {
     if (!conversationId || !newMessage.trim()) {
-      console.error("Cannot send message: Invalid conversationId or empty message");
+      console.error(
+        "Cannot send message: Invalid conversationId or empty message"
+      );
       return;
     }
 
@@ -133,7 +143,9 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
 
   const handleTyping = () => {
     if (!chatPartner || socket?.readyState !== WebSocket.OPEN) {
-      console.error("Cannot send typing event: No chat partner or WebSocket is not open.");
+      console.error(
+        "Cannot send typing event: No chat partner or WebSocket is not open."
+      );
       return;
     }
 
@@ -167,20 +179,25 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      const response = await api.delete(`/conversations/${conversationId}/messages/${messageId}/`);
+      const response = await api.delete(
+        `/conversations/${conversationId}/messages/${messageId}/`
+      );
       if (response.status === 204) {
-        setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== messageId));
+        setMessages((prevMessages) =>
+          prevMessages.filter((msg) => msg.id !== messageId)
+        );
       }
     } catch (error) {
       console.error("Error deleting message:", error);
     }
   };
-  
 
   return (
     <div className="conversation-container">
       <div className="conversation-header">
-        <button className="back-button" onClick={onBack}>Back</button>
+        <button className="back-button" onClick={onBack}>
+          Back
+        </button>
         <h3>{chatPartner ? `Chat with ${chatPartner.username}` : "Chat"}</h3>
         <div className="online-status">
           {onlineUsers.length > 0 ? (
@@ -203,7 +220,12 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
             const isSentByCurrentUser = message.sender?.id === currentUserId;
 
             return (
-              <div key={index} className={`message-wrapper ${isSentByCurrentUser ? "sent" : "received"}`}>
+              <div
+                key={index}
+                className={`message-wrapper ${
+                  isSentByCurrentUser ? "sent" : "received"
+                }`}
+              >
                 {!isSentByCurrentUser && (
                   <span className="message-username">
                     {message.sender?.username || "Unknown"}
@@ -220,7 +242,9 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
                     </button>
                   )}
                 </div>
-                <div className="message-timestamp">{formatTimestamp(message.timestamp)}</div>
+                <div className="message-timestamp">
+                  {formatTimestamp(message.timestamp)}
+                </div>
               </div>
             );
           })
@@ -238,7 +262,7 @@ const Conversation = ({ conversationId, currentUserId, onBack }) => {
           type="text"
           value={newMessage}
           onChange={(e) => {
-            setNewMessage(e.target.value) 
+            setNewMessage(e.target.value);
             debouncedHandleTyping();
           }}
           onKeyDown={handleTyping}
