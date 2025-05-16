@@ -1,13 +1,12 @@
 import axios from 'axios';
 import { ACCESS_TOKEN } from './token';
 
-
-const apiUrl = "http://localhost:8000/chat";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/chat";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : apiUrl,
-})
-
+  baseURL: apiUrl,
+  withCredentials: true
+});
 
 api.interceptors.request.use(
   (config) => {
@@ -18,9 +17,8 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    Promise.reject(error);
+    return Promise.reject(error);
   }
-  
 );
 
 export default api;
